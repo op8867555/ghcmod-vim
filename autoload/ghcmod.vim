@@ -36,6 +36,18 @@ function! ghcmod#type(line, col, path, module) "{{{
   return l:types
 endfunction "}}}
 
+
+function! ghcmod#refine(line, col, path, module, name) "{{{
+  let l:cmd = ghcmod#build_command(['refine', a:path, a:module, a:line, a:col, a:name])
+  let l:output = ghcmod#system(l:cmd)
+  if empty(l:output)
+    return []
+  endif
+  let l:matched = matchlist(l:output, '\(\d\+\) \(\d\+\) \(\d\+\) \(\d\+\) "\([^"]\+\)"')
+  return l:matched[5]
+endfunction "}}}
+
+
 function! ghcmod#detect_module() "{{{
   let l:regex = '^\C>\=\s*module\s\+\zs[A-Za-z0-9.]\+'
   for l:lineno in range(1, line('$'))

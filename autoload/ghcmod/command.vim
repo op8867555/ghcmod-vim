@@ -56,6 +56,31 @@ function! ghcmod#command#type_clear() "{{{
   endif
 endfunction "}}}
 
+function! ghcmod#command#refine(force) "{{{
+  let l:path = s:buffer_path(a:force)
+  if empty(l:path)
+    return
+  endif
+
+  let l:module = ghcmod#detect_module()
+  let l:name = input("Refine with: ")
+  let l:result = ghcmod#refine(line('.'), col('.'), l:path, l:module, l:name)
+
+  if empty(l:result)
+    call ghcmod#util#print_error('Unable to refine')
+    return
+  endif
+
+  let l:ls = split(substitute(getline('.'), expand("<cword>"), "\n", ''), '\n')
+  let l:lines = join([l:ls[0], l:result] + l:ls[1:-1], '')
+  normal dd
+  for l:line in split(l:lines, '\n')
+    call append(line('.'), l:line)
+  endfor
+  silent w
+
+endfunction "}}}
+
 function! ghcmod#command#type_insert(force) "{{{
   let l:path = s:buffer_path(a:force)
   if empty(l:path)
